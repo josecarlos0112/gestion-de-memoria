@@ -21,4 +21,12 @@ int main() {
         CloseHandle(hMapFile);
         exit(EXIT_FAILURE);
     }
+
+    // Your fork logic
+    printf("Writing to shared memory: %s\n", "Hello, child process!");
+    fflush(stdout);
+
+    // Simulating the child process
+    Sleep(2000); // Sleep for 2 seconds (simulating child process doing some work)
+
 }
