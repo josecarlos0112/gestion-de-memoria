@@ -7,9 +7,11 @@
 
 void parentProcess(HANDLE hMapFile, LPCTSTR pBuf) {
     // Writing to shared memory
-    strcpy((char*)pBuf, "Hello, child process!");
-
-    printf("Parent process wrote to shared memory: %s\n", (char*)pBuf);
+    for (int i = 0; i < 10; i++) {
+        sprintf((char*)pBuf, "Number: %d", i);
+        printf("Ruben wrote to shared memory: %s\n", (char*)pBuf);
+        Sleep(1000); // Simulate some work
+    }
 
     // Unmap and close handles
     UnmapViewOfFile(pBuf);
@@ -17,11 +19,11 @@ void parentProcess(HANDLE hMapFile, LPCTSTR pBuf) {
 }
 
 void childProcess(HANDLE hMapFile, LPCTSTR pBuf) {
-    // Simulating some work in the child process
-    Sleep(1000);
-
     // Reading from shared memory
-    printf("Child process reads: %s\n", (char*)pBuf);
+    for (int i = 0; i < 10; i++) {
+        printf("Ruben cuenta hasta: %s\n", (char*)pBuf);
+        Sleep(1000); // Simulate some work
+    }
 
     // Unmap and close handles
     UnmapViewOfFile(pBuf);
