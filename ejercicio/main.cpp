@@ -5,16 +5,43 @@
 
 #define SIZE 4096
 
+void parentProcess(HANDLE hMapFile, LPCTSTR pBuf) {
+    // Writing to shared memory
+    strcpy((char*)pBuf, "Hello, child process!");
+
+    printf("Parent process wrote to shared memory: %s\n", (char*)pBuf);
+
+    // Unmap and close handles
+    UnmapViewOfFile(pBuf);
+    CloseHandle(hMapFile);
+}
+
+void childProcess(HANDLE hMapFile, LPCTSTR pBuf) {
+    // Simulating some work in the child process
+    Sleep(1000);
+
+    // Reading from shared memory
+    printf("Child process reads: %s\n", (char*)pBuf);
+
+    // Unmap and close handles
+    UnmapViewOfFile(pBuf);
+    CloseHandle(hMapFile);
+
+    exit(EXIT_SUCCESS);
+}
+
 int main() {
     HANDLE hMapFile;
     LPCTSTR pBuf;
 
-    hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, SIZE, "SharedMemory");
+    // Create file mapping
+    hMapFile = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, SIZE, L"SharedMemory");
     if (hMapFile == NULL) {
         perror("CreateFileMapping");
         exit(EXIT_FAILURE);
     }
 
+    // Map view of the file into memory
     pBuf = (LPTSTR)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, SIZE);
     if (pBuf == NULL) {
         perror("MapViewOfFile");
@@ -22,17 +49,15 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // Your fork logic
-    printf("Writing to shared memory: %s\n", "Hello, child process!");
-    fflush(stdout);
+    DWORD pid = GetCurrentProcessId();
 
-    // Simulating the child process
-    Sleep(2000); // Sleep for 2 seconds (simulating child process doing some work)
-
-    printf("Child reads: %s\n", pBuf);
-
-    UnmapViewOfFile(pBuf);
-    CloseHandle(hMapFile);
+    if (pid == 0) {
+        // Child process logic
+        childProcess(hMapFile, pBuf);
+    } else {
+        // Parent process logic
+        parentProcess(hMapFile, pBuf);
+    }
 
     return 0;
 }
