@@ -29,4 +29,10 @@ int main() {
     // Simulating the child process
     Sleep(2000); // Sleep for 2 seconds (simulating child process doing some work)
 
+    printf("Child reads: %s\n", pBuf);
+
+    UnmapViewOfFile(pBuf);
+    CloseHandle(hMapFile);
+
+    return 0;
 }
